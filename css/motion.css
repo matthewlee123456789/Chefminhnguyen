@@ -1,0 +1,202 @@
+/* ============================================================
+   CHEF MINH NGUYỄN — HỆ CHUYỂN ĐỘNG
+   Nạp sau style.css. Chỉ dùng transform và opacity để máy yếu
+   vẫn chạy mượt (không làm trình duyệt tính lại bố cục).
+   ============================================================ */
+
+:root{
+  --mo-slow: 1.05s;
+  --mo-mid:  .78s;
+  --mo-fast: .42s;
+  --mo-ease: cubic-bezier(.22,.61,.36,1);
+  --mo-out:  cubic-bezier(.16,1,.3,1);
+}
+
+/* ---------- 1. Vạch tiến độ cuộn ---------- */
+.scroll-bar{
+  position:fixed; top:0; left:0; height:2px; z-index:120;
+  width:100%; transform:scaleX(0); transform-origin:0 50%;
+  background:linear-gradient(90deg, var(--cinnabar), var(--gold) 55%, var(--gold-bright));
+  pointer-events:none;
+  will-change:transform;
+}
+
+/* ---------- 2. Màn chuyển trang ---------- */
+.page-veil{
+  position:fixed; inset:0; z-index:300;
+  background:var(--lacquer-deep);
+  pointer-events:none; opacity:0;
+  transition:opacity .34s var(--mo-ease);
+}
+.page-veil.on{ opacity:1; pointer-events:all; }
+.page-veil svg{
+  position:absolute; top:50%; left:50%;
+  width:76px; height:76px; margin:-38px 0 0 -38px;
+  color:var(--gold); opacity:0;
+  transition:opacity .3s var(--mo-ease) .08s;
+}
+.page-veil.on svg{ opacity:.85; animation:veilSpin 1.4s linear infinite; }
+@keyframes veilSpin{ to{ transform:rotate(360deg); } }
+
+/* Vào trang: nhả màn */
+body.booting .page-veil{ opacity:1; }
+
+/* ---------- 3. Chữ lộ dần bằng mặt nạ ---------- */
+[data-mo="text"]{
+  clip-path:inset(0 0 108% 0);
+  transform:translateY(15px);
+  transition:clip-path var(--mo-slow) var(--mo-out),
+             transform var(--mo-slow) var(--mo-out);
+  transition-delay:var(--mo-d, 0ms);
+}
+[data-mo="text"].in{ clip-path:inset(-14% 0 -18% 0); transform:none; }
+
+/* ---------- 4. Ảnh lộ dần từ dưới lên, kèm thu phóng ---------- */
+[data-mo="img"]{
+  clip-path:inset(0 0 100% 0);
+  transition:clip-path 1.15s var(--mo-out);
+  transition-delay:var(--mo-d, 0ms);
+}
+[data-mo="img"].in{ clip-path:inset(0 0 0 0); }
+[data-mo="img"] img{
+  transform:translate3d(0, var(--py, 0px), 0) scale(var(--ps, 1.1));
+  transition:transform 1.25s var(--mo-out);
+  will-change:transform;
+}
+[data-mo="img"]:not(.in) img{ transform:translate3d(0,0,0) scale(1.22); }
+
+/* ---------- 5. Khối con so le ---------- */
+[data-mo="stagger"] > *{
+  opacity:0; transform:translateY(24px);
+  transition:opacity var(--mo-mid) var(--mo-ease),
+             transform var(--mo-mid) var(--mo-out);
+}
+[data-mo="stagger"].in > *{ opacity:1; transform:none; }
+
+/* ---------- 6. Nghiêng 3D theo con trỏ ---------- */
+.tilt-wrap{ perspective:1100px; }
+.tilt{
+  transform-style:preserve-3d;
+  transition:transform .5s var(--mo-out);
+  will-change:transform;
+}
+.tilt.active{ transition:transform .12s linear; }
+.tilt::before{
+  content:''; position:absolute; inset:0; z-index:3;
+  pointer-events:none; opacity:0;
+  transition:opacity .4s var(--mo-ease);
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),
+             rgba(230,206,147,.14), transparent 62%);
+}
+.tilt.active::before{ opacity:1; }
+.band--shell .tilt::before{
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),
+             rgba(140,35,24,.09), transparent 62%);
+}
+
+/* ---------- 7. Nút hút theo con trỏ ---------- */
+.magnet{ transition:transform .45s var(--mo-out); will-change:transform; }
+.magnet.active{ transition:transform .14s linear; }
+
+/* ---------- 8. Bông lúa tự vẽ ---------- */
+.stalk-rule svg path{
+  stroke-dasharray:var(--len, 60);
+  stroke-dashoffset:var(--len, 60);
+  transition:stroke-dashoffset 1.1s var(--mo-ease);
+}
+.stalk-rule.in svg path{ stroke-dashoffset:0; }
+.stalk-rule::before,.stalk-rule::after{
+  transform:scaleX(0); transform-origin:var(--o, 100%) 50%;
+  transition:transform .95s var(--mo-out) .12s;
+}
+.stalk-rule::after{ --o:0%; }
+.stalk-rule.in::before,.stalk-rule.in::after{ transform:scaleX(1); }
+
+/* ---------- 9. Con dấu chìm xoay theo cuộn ---------- */
+.seal-ghost{
+  position:absolute; top:50%; left:50%;
+  width:min(78vw, 720px); aspect-ratio:1;
+  margin:calc(min(78vw,720px) / -2) 0 0 calc(min(78vw,720px) / -2);
+  color:var(--gold); opacity:.05;
+  pointer-events:none; z-index:0;
+  transform:rotate(var(--rot, 0deg));
+  will-change:transform;
+}
+.seal-ghost svg{ width:100%; height:100%; }
+#philosophy > .wrap{ position:relative; z-index:1; }
+
+/* ---------- 10. Số 15 nhô lên ---------- */
+.craft__num{
+  display:inline-block;
+  transform:translateY(var(--num-y, 0px));
+  will-change:transform;
+}
+
+/* ---------- 11. Hero rời đi khi cuộn ---------- */
+.hero--video .wrap{
+  transform:translateY(var(--hero-y, 0px));
+  opacity:var(--hero-o, 1);
+  will-change:transform, opacity;
+}
+
+/* ---------- 12. Modal mở có chiều sâu ---------- */
+.modal__panel{
+  transform:translateY(28px) scale(.985);
+  opacity:0;
+  transition:transform .55s var(--mo-out), opacity .4s var(--mo-ease);
+}
+.modal.is-open .modal__panel{ transform:none; opacity:1; }
+.modal__bg{ opacity:0; transition:opacity .4s var(--mo-ease); }
+.modal.is-open .modal__bg{ opacity:1; }
+
+/* ---------- 13. Gạch chân điều hướng quét ngang ---------- */
+.nav a{ position:relative; border-bottom-color:transparent !important; }
+.nav a::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+  background:currentColor; transform:scaleX(0); transform-origin:100% 50%;
+  transition:transform .42s var(--mo-out);
+}
+.nav a:hover::after,.nav a.is-active::after{ transform:scaleX(1); transform-origin:0 50%; }
+
+/* ---------- 14. Thẻ món: chữ trượt lên khi rê chuột ---------- */
+.dish__cap{ transition:transform .5s var(--mo-out); }
+.dish:hover .dish__cap{ transform:translateY(-4px); }
+.dish:hover [data-mo="img"] img{ --ps:1.16; }
+
+/* ---------- 15. Mũi tên trong nút ---------- */
+.btn .ar,.link-arrow .ar{ transition:transform .4s var(--mo-out); }
+.btn:hover .ar{ transform:translateX(5px); }
+
+/* ---------- 16. Đường kẻ ngang tự kéo ---------- */
+.stat,.award-row,.info-row{ position:relative; }
+.stat::after,.award-row::after{
+  content:''; position:absolute; left:0; bottom:-1px; height:1px; width:100%;
+  background:var(--gold); transform:scaleX(0); transform-origin:0 50%;
+  transition:transform .8s var(--mo-out);
+  transition-delay:var(--mo-d, 0ms);
+}
+.stats.in .stat::after,.awards.in .award-row::after{ transform:scaleX(1); }
+
+/* ============================================================
+   TÔN TRỌNG CHẾ ĐỘ GIẢM CHUYỂN ĐỘNG
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  [data-mo="text"],[data-mo="img"]{ clip-path:none !important; transform:none !important; }
+  [data-mo="img"] img{ transform:none !important; }
+  [data-mo="stagger"] > *{ opacity:1 !important; transform:none !important; }
+  .tilt,.magnet{ transform:none !important; }
+  .scroll-bar,.seal-ghost{ display:none; }
+  .page-veil{ display:none; }
+  .stalk-rule svg path{ stroke-dashoffset:0 !important; }
+  .stalk-rule::before,.stalk-rule::after{ transform:scaleX(1) !important; }
+  .modal__panel{ transform:none !important; opacity:1 !important; }
+  .stat::after,.award-row::after{ transform:scaleX(1) !important; }
+  .hero--video .wrap{ transform:none !important; opacity:1 !important; }
+}
+
+/* Máy cảm ứng: bỏ nghiêng và hút con trỏ */
+@media (hover: none), (pointer: coarse){
+  .tilt{ transform:none !important; }
+  .tilt::before{ display:none; }
+  .magnet{ transform:none !important; }
+}
