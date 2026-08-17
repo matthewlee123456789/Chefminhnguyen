@@ -1,0 +1,152 @@
+/* ============================================================
+   QUẢNG CÁO
+   Desktop ≥1280px : 3 cột 20 / 57 / 20, thẻ dọc 160×600
+   Dưới 1280px     : chuyển thành banner ngang, chèn giữa nội dung
+   ============================================================ */
+
+.sponsor-rail{ position:absolute; width:160px; z-index:40; pointer-events:none; display:none; }
+.sponsor-rail--left{  left:calc(10% - 80px); }
+.sponsor-rail--right{ right:calc(10% - 80px); }
+
+.sponsor-card{
+  position:sticky; top:104px; pointer-events:auto;
+  display:flex; flex-direction:column;
+  width:160px; height:600px; overflow:hidden;
+  background:var(--lacquer-raised);
+  border:1px solid rgba(198,166,100,.26);
+  transition:border-color .4s ease, transform .5s cubic-bezier(.16,1,.3,1);
+}
+.sponsor-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
+
+.sponsor-card__tag{
+  flex:none; display:flex; align-items:center; gap:5px;
+  font-size:.5rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold-dim); padding:7px 10px 6px;
+  border-bottom:1px solid rgba(198,166,100,.14);
+}
+.sponsor-card__tag svg{ width:9px; height:9px; flex:none; }
+
+.sponsor-card__img{
+  position:relative; flex:none; height:238px; overflow:hidden;
+  background:var(--lacquer);
+}
+.sponsor-card__img img{
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:cover;
+  transition:transform .9s cubic-bezier(.16,1,.3,1);
+}
+/* Hai ảnh sản phẩm luân phiên */
+.sponsor-card__img img.b{ animation:sponsorFade 9s ease-in-out infinite; }
+@keyframes sponsorFade{ 0%,44%{opacity:0} 56%,94%{opacity:1} 100%{opacity:0} }
+.sponsor-card:hover .sponsor-card__img img{ transform:scale(1.06); }
+.sponsor-card__img::after{
+  content:''; position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg, transparent 42%, rgba(11,8,7,.86) 100%);
+}
+
+.sponsor-card__body{ flex:1; min-height:0; display:flex; flex-direction:column; padding:12px 11px 11px; }
+.sponsor-card__kicker{ font-size:.5rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cinnabar); display:block; margin-bottom:5px; }
+.sponsor-card__title{ font-family:var(--display); font-size:1rem; font-weight:600; line-height:1.2; color:var(--shell); margin:0 0 6px; }
+.sponsor-card__line{ font-size:.63rem; line-height:1.5; color:var(--cream-soft); margin:0 0 9px; }
+.sponsor-card__list{ list-style:none; margin:0 0 8px; padding:0; font-size:.61rem; line-height:1.45; color:var(--cream-soft); }
+.sponsor-card__list li{ padding:3px 0 3px 12px; position:relative; }
+.sponsor-card__list li svg{ position:absolute; left:0; top:6px; width:7px; height:7px; color:var(--gold-dim); }
+.sponsor-card__cta{
+  margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:6px;
+  font-size:.55rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+  padding-top:8px; border-top:1px solid rgba(198,166,100,.22);
+}
+.sponsor-card__cta svg{ width:11px; height:11px; transition:transform .4s cubic-bezier(.16,1,.3,1); }
+.sponsor-card:hover .sponsor-card__cta svg{ transform:translateX(4px); }
+
+.sponsor-card::before{
+  content:''; position:absolute; top:0; left:-60%; width:60%; height:1px; z-index:3;
+  background:linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  animation:sponsorSweep 8s ease-in-out infinite;
+}
+.sponsor-card--b::before{ animation-delay:4s; }
+@keyframes sponsorSweep{ 0%,74%{ left:-60%; } 93%,100%{ left:100%; } }
+
+.sponsor-card__x{
+  position:absolute; top:5px; right:5px; z-index:4; width:20px; height:20px;
+  background:rgba(11,8,7,.65); border:1px solid rgba(198,166,100,.22);
+  color:var(--gold-dim); font-size:.58rem; line-height:1;
+  opacity:0; transition:opacity .3s ease, color .3s ease;
+}
+.sponsor-card:hover .sponsor-card__x{ opacity:1; }
+.sponsor-card__x:hover{ color:var(--gold); }
+
+/* ---------- Bố cục 3 cột ---------- */
+@media (min-width: 1280px){
+  .sponsor-rail{ display:block; }
+  .szone .wrap{ max-width:min(57vw, 1180px); }
+  .szone .dish--a,.szone .dish--b{ grid-column:span 6; }
+  .szone .media-grid,.szone .videos{ grid-template-columns:repeat(2,1fr); }
+  .szone .posts{ grid-template-columns:repeat(2,1fr); }
+  .szone .course{ grid-template-columns:1fr 1fr; }
+
+  .sponsor-rail.on-light .sponsor-card{ background:rgba(255,255,255,.6); border-color:var(--shell-line); }
+  .sponsor-rail.on-light .sponsor-card__title{ color:var(--ink); }
+  .sponsor-rail.on-light .sponsor-card__line,
+  .sponsor-rail.on-light .sponsor-card__list{ color:var(--ink-soft); }
+  .sponsor-rail.on-light .sponsor-card__tag{ color:var(--ink-soft); border-bottom-color:var(--shell-line); }
+  .sponsor-rail.on-light .sponsor-card__cta{ color:var(--cinnabar); border-top-color:var(--shell-line); }
+}
+@media (min-width: 1700px){ .szone .wrap{ max-width:1180px; } }
+
+/* ============================================================
+   BANNER NGANG — máy tính bảng và điện thoại
+   ============================================================ */
+.sponsor-bar{ display:none; }
+@media (max-width: 1279px){
+  .sponsor-bar{
+    display:block; position:relative;
+    margin:0 auto; max-width:760px;
+    border:1px solid rgba(198,166,100,.26);
+    background:var(--lacquer-raised);
+    overflow:hidden;
+  }
+  .band--shell .sponsor-bar{ background:rgba(255,255,255,.6); border-color:var(--shell-line); }
+  .sponsor-bar__tag{
+    position:absolute; top:0; left:0; z-index:3;
+    display:flex; align-items:center; gap:5px;
+    font-size:.5rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold-dim); padding:6px 12px;
+    background:rgba(11,8,7,.68);
+  }
+  .sponsor-bar__tag svg{ width:9px; height:9px; }
+  .sponsor-bar__img{ position:relative; height:150px; overflow:hidden; }
+  .sponsor-bar__img img{ width:100%; height:100%; object-fit:cover; }
+  .sponsor-bar__img::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, transparent 40%, rgba(11,8,7,.85) 100%);
+  }
+  .sponsor-bar__body{ padding:16px 18px 18px; }
+  .sponsor-bar__kicker{ font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cinnabar); display:block; margin-bottom:6px; }
+  .sponsor-bar__title{ font-family:var(--display); font-size:1.35rem; font-weight:600; line-height:1.2; margin:0 0 7px; color:var(--shell); }
+  .band--shell .sponsor-bar__title{ color:var(--ink); }
+  .sponsor-bar__line{ font-size:.85rem; line-height:1.6; color:var(--cream-soft); margin:0 0 14px; }
+  .band--shell .sponsor-bar__line{ color:var(--ink-soft); }
+  .sponsor-bar__cta{
+    display:inline-flex; align-items:center; gap:9px;
+    font-size:.66rem; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--gold); border-bottom:1px solid var(--gold-dim); padding-bottom:4px;
+  }
+  .band--shell .sponsor-bar__cta{ color:var(--cinnabar); border-bottom-color:var(--shell-line); }
+  .sponsor-bar__cta svg{ width:12px; height:12px; }
+  .sponsor-bar__x{
+    position:absolute; top:6px; right:6px; z-index:4; width:26px; height:26px;
+    background:rgba(11,8,7,.6); border:1px solid rgba(198,166,100,.24);
+    color:var(--gold-dim); font-size:.68rem;
+  }
+}
+@media (max-width: 767px){
+  .sponsor-bar{ max-width:100%; }
+  .sponsor-bar__img{ height:118px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sponsor-card::before, .sponsor-card__img img.b{ animation:none; }
+  .sponsor-card__img img.b{ opacity:0; }
+  .sponsor-card,.sponsor-card__img img{ transition:none; }
+}
